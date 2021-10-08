@@ -1,6 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Entities.Entities;
+using Microsoft.EntityFrameworkCore;
 
-namespace Infrastructur.Configuration
+namespace Infrastructure.Configuration
 {
     public class ContextBase: DbContext
     {
@@ -8,6 +9,8 @@ namespace Infrastructur.Configuration
         {
             Database.EnsureCreated();
         }
+
+        public DbSet<Product> Product { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
