@@ -2,6 +2,7 @@ using ApplicationApp.Interfaces;
 using ApplicationApp.OpenApp;
 using Domain.Interfaces.Generics;
 using Domain.Interfaces.InterfaceProduct;
+using Infrastructure.Configuration;
 using Infrastructure.Repository.Generics;
 using Infrastructure.Repository.Repositories;
 using Microsoft.AspNetCore.Builder;
@@ -24,10 +25,11 @@ namespace Web_DDD_UI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<ContextBase>();
             services.AddSingleton(typeof(IGeneric<>), typeof(RepositoryGenerics<>));
             services.AddSingleton<IProduct, RepositoryProduct>();
+            services.AddSingleton<InterfaceProductApp, AppProduct>(); ;
 
-            services.AddSingleton<InterfaceProductApp, AppProduct>();
             services.AddControllersWithViews();
         }
 

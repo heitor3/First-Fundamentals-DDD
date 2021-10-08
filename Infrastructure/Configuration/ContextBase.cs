@@ -14,7 +14,6 @@ namespace Infrastructure.Configuration
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-
             if (!optionsBuilder.IsConfigured)
                 optionsBuilder.UseSqlServer(GetStringConnectionConfig());
             base.OnConfiguring(optionsBuilder);
