@@ -1,28 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
+﻿using ApplicationApp.Interfaces;
 using Entities.Entities;
 using Infrastructure.Configuration;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Web_DDD_UI.Controllers
 {
+
     public class ProductsController : Controller
     {
-        private readonly ContextBase _context;
-
-        public ProductsController(ContextBase context)
+        private readonly InterfaceProductApp _InterfaceProductApp;
+       
+        public ProductsController(InterfaceProductApp InterfaceProductApp)
         {
-            _context = context;
+            _InterfaceProductApp = InterfaceProductApp;
         }
 
         // GET: Products
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Product.ToListAsync());
+            return View(await _InterfaceProductApp.List());
         }
 
         // GET: Products/Details/5
@@ -33,8 +32,7 @@ namespace Web_DDD_UI.Controllers
                 return NotFound();
             }
 
-            var product = await _context.Product
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var product = await _InterfaceProductApp.GetEntityById((int)id);
             if (product == null)
             {
                 return NotFound();
@@ -54,12 +52,12 @@ namespace Web_DDD_UI.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Preco,Ativo,Id,Nomew")] Product product)
+        public async Task<IActionResult> Create([Bind("Preco,Ativo,Id,Nome")] Product product)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(product);
-                await _context.SaveChangesAsync();
+                await _InterfaceProductApp.Add(product);
+               
                 return RedirectToAction(nameof(Index));
             }
             return View(product);
@@ -73,7 +71,7 @@ namespace Web_DDD_UI.Controllers
                 return NotFound();
             }
 
-            var product = await _context.Product.FindAsync(id);
+            var product = await _InterfaceProductApp.GetEntityById((int)id);
             if (product == null)
             {
                 return NotFound();
@@ -86,7 +84,7 @@ namespace Web_DDD_UI.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Preco,Ativo,Id,Nomew")] Product product)
+        public async Task<IActionResult> Edit(int id, [Bind("Preco,Ativo,Id,Nome")] Product product)
         {
             if (id != product.Id)
             {
@@ -97,12 +95,11 @@ namespace Web_DDD_UI.Controllers
             {
                 try
                 {
-                    _context.Update(product);
-                    await _context.SaveChangesAsync();
+                    await _InterfaceProductApp.Update(product);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ProductExists(product.Id))
+                    if (! await ProductExists(product.Id))
                     {
                         return NotFound();
                     }
@@ -124,8 +121,8 @@ namespace Web_DDD_UI.Controllers
                 return NotFound();
             }
 
-            var product = await _context.Product
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var product = await _InterfaceProductApp.GetEntityById((int)id);
+                
             if (product == null)
             {
                 return NotFound();
@@ -139,15 +136,17 @@ namespace Web_DDD_UI.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var product = await _context.Product.FindAsync(id);
-            _context.Product.Remove(product);
-            await _context.SaveChangesAsync();
+            var product = await _InterfaceProductApp.GetEntityById(id);
+            await _InterfaceProductApp.Delete(product);
+          
             return RedirectToAction(nameof(Index));
         }
 
-        private bool ProductExists(int id)
+        private async Task<bool> ProductExists(int id)
         {
-            return _context.Product.Any(e => e.Id == id);
+            var entity = await _InterfaceProductApp.GetEntityById(id);
+
+            return entity != null;
         }
     }
 }

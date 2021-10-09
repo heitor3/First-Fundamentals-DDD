@@ -7,7 +7,7 @@ namespace Entities.Entities
         [Display(Name = "Preço")]
         public decimal Preco { get; set; }
 
-        [Display(Name = "Nome")]
+        [Display(Name = "Ativo")]
         public bool Ativo { get; set; }
     }
 }

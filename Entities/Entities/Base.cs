@@ -9,6 +9,6 @@ namespace Entities.Entities
         public int Id { get; set; }
 
         [Display(Name = "Nome")]
-        public string Nomew { get; set; }
+        public string Nome { get; set; }
     }
 }
